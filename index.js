@@ -30,11 +30,31 @@ app.get("/weather", (req, res) => {
 });
 
 app.get("/time", async (req, res) => {
-  console.log(req.clientIp);
-  let url = `http://worldtimeapi.org/api/ip/${req.clientIp}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  res.json({ time: data, clientIp: req.clientIp });
+  let dt = req.query.dt;
+  let date = new Date(parseInt(`${dt}000`));
+
+  console.log(date);
+
+  let timeString = date.toLocaleString("en-US", { hour: "numeric", minute: "numeric", hour12: true });
+
+  let dayOfWeekString = date.toLocaleString("en-US", { weekday: "long" });
+  let monthString = date.toLocaleString("en-US", { month: "long" });
+
+  let dayOfMonthString = date.toLocaleString("en-US", { day: "numeric" });
+  // add st nd rd th
+  if (dayOfMonthString === "1" || dayOfMonthString === "21" || dayOfMonthString === "31") {
+    dayOfMonthString += "st";
+  } else if (dayOfMonthString === "2" || dayOfMonthString === "22") {
+    dayOfMonthString += "nd";
+  } else if (dayOfMonthString === "3" || dayOfMonthString === "23") {
+    dayOfMonthString += "rd";
+  } else {
+    dayOfMonthString += "th";
+  }
+
+  let longString = `${dayOfWeekString}, ${monthString} ${dayOfMonthString} at ${timeString}`;
+
+  res.json({ time: date, string: date.toLocaleString(), dayOfWeek: dayOfWeekString, month: monthString, dayOfMonth: dayOfMonthString, timeString: timeString, longString: longString });
 });
 
 app.listen(3000, () => {
